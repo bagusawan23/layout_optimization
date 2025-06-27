@@ -71,14 +71,19 @@ packing_y = st.sidebar.number_input("Packing Point Y", value=5)
 packing_point = (packing_x, packing_y)
 
 # Generate dummy layout
-np.random.seed(42)
+# Slot ID dan order frequency tetap
+fixed_order_freq = np.random.RandomState(42).randint(1, 101, 200)
+fixed_slot_ids = [f"S{i:03d}" for i in range(200)]
+
 x_coords = np.random.randint(0, grid_x, num_slots)
 y_coords = np.random.randint(0, grid_y, num_slots)
-order_freq = np.random.randint(1, 101, num_slots)
+order_freq = fixed_order_freq[:num_slots]
+slot_ids = fixed_slot_ids[:num_slots]
+
 distance_to_packing = np.sqrt((x_coords - packing_point[0])**2 + (y_coords - packing_point[1])**2)
 
 dummy_layout_df = pd.DataFrame({
-    "slot_id": [f"S{i:03d}" for i in range(num_slots)],
+    "slot_id": slot_ids,
     "x": x_coords,
     "y": y_coords,
     "order_frequency": order_freq,
@@ -117,11 +122,14 @@ scatter1 = axs[0].scatter(dummy_layout_df["x"], dummy_layout_df["y"],
                           c=dummy_layout_df["order_frequency"], cmap="plasma", s=80)
 axs[0].set_title("Before Optimization")
 axs[0].invert_yaxis()
+axs[0].legend(["Order Frequency"], loc="upper right")
 
 scatter2 = axs[1].scatter(optimized_df["x"], optimized_df["y"],
                           c=optimized_df["order_frequency"], cmap="plasma", s=80)
 axs[1].set_title("After Optimization")
 axs[1].invert_yaxis()
+axs[1].legend(["Order Frequency"], loc="upper right")
+
 st.pyplot(fig)
 
 # Tabel perbandingan
